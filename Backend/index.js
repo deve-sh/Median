@@ -194,6 +194,56 @@ app.post('/submitpost', (req, res) => {
     }
 });
 
+// Route to get a dump of posts, page by page. 10 a page.
+
+app.get('/posts', (req,res) => {
+    let postsPerPage = 10;
+    let currentPage = 1;        // Default Page Number.
+
+    if(req.query.page){
+        currentPage = Number(req.query.page);
+
+        if(!currentPage)        // If an error came during the parsing of the page number sent in the query.
+            currentPage = 1;
+    }
+
+    conn.query("SELECT * FROM blog_posts", (err, data) => {
+        if(err)
+            res.status(500).send({error: "Internal Server Error."});
+        
+        if(data.length > 0){
+            // Execute only if the data has at least one entry.
+
+            let totalPosts = data.length;
+
+            let next = false, prev = false;
+
+            let dataToSend = {};
+
+            conn.query("SELECT * FROM blog_posts LIMIT 10 OFFSET ?", [(currentPage-1)*postsPerPage.toString()], (err1, data1) => {
+                if(err1){
+                    console.log(err1);
+                    res.status(500).json({error: "Internal Server Error."});
+                }
+                
+                if(currentPage*postsPerPage > 10 && totalPosts > 10)
+                    prev = true;
+
+                if(currentPage*postsPerPage < totalPosts)
+                    next = true;
+
+                dataToSend = {posts : data1, next, prev};
+
+                res.json(dataToSend);
+            });
+        }
+        else{
+            let dataToSend = {posts: data, next : false, prev : false};
+            res.json(dataToSend);     // Send an empty array.
+        }
+    });
+});
+
 // Route to get a post.
 
 app.get('/getpost', (req,res) => {
@@ -202,7 +252,7 @@ app.get('/getpost', (req,res) => {
     if(req.query.pid || req.query.postid){
         const pid = req.query.pid || req.query.postid;
 
-        conn.query("SELECT * FROM blog_posts WHERE postid = ?", [pid], (err,data) =>{
+        conn.query("SELECT * FROM blog_posts WHERE postid = ?", [pid], (err,data) => {
             if(err)
                 res.status(500).send({error: "Internal Server Error."});
 

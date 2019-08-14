@@ -79,7 +79,7 @@ app.post('/register', (req,res) => {
                         
                         // If the insertion is successful, then sign a JWT with the username and send it to the frontend.
 
-                        res.status(200).json({message:"User Successfully registered.", token});
+                        res.status(200).json({message:"User Successfully registered."});
                     });
                 }
             }

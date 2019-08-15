@@ -334,6 +334,50 @@ app.post('/updatepost', (req, res) => {
     }
 });
 
+// Route to get the posts of a user.
+
+app.post('/userposts', (req,res) => {
+    let currentPage = 1;
+    let prev = false, next = false;
+
+    if(req.body.page && req.body.page > 0){
+        currentPage = Number(escape(req.body.page));
+
+        if(!currentPage)
+            currentPage = 1;
+    }
+
+    if(!req.body.token){
+        res.status(400).json({error: "Required Token."});
+    }
+    else{
+        const token = escape(req.body.token);
+
+        jwt.verify(token, process.env.SECRETKEY, (err, decoded) => {
+            if(err)
+                res.status(400).json({error: "Invalid Token."});
+            else{
+                let userid = escape(decoded.userid);
+
+                conn.query("SELECT * FROM blog_posts WHERE id = ?", [userid], (err1,data) => {
+                    if(err)
+                        res.status(500).json({error : "Internal Server Error."});
+
+                    if(data.length === 1){
+                        // If the user exists in the database.
+
+                        
+                    }
+                    else{
+                        res.status(404).json({error: "Invalid User ID."});
+                    }
+                });
+            }
+        });
+    }
+});
+
+
 // Route to validate a token sent by the Frontend.
 
 app.post('/validate', (req,res) => {
@@ -349,11 +393,11 @@ app.post('/validate', (req,res) => {
             if(decoded.userid){
                 // Userid Verfied using the token, now a second layer of verification would be to check if a user with the given userid exists in the database.
 
-                conn.query("SELECT * FROM blog_users WHERE id = ?", [decoded.userid], (err1, data1) => {
+                conn.query("SELECT * FROM blog_users WHERE id = ?", [escape(decoded.userid)], (err1, data1) => {
                     if(err1)
                         res.status(500).json({error: "Internal Server Error."});
 
-                    if(data1.length > 0)
+                    if(data1.length === 1)
                         res.status(200).json({message:"Valid Token."});
                     else
                         res.status(404).json({error : "Invalid Token."});

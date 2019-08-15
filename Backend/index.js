@@ -237,13 +237,13 @@ app.get('/posts', (req,res) => {
                 if(currentPage*postsPerPage < totalPosts)
                     next = true;
 
-                dataToSend = {posts : data1, next, prev};
+                dataToSend = {posts : data1, next, prev, page : currentPage};
 
                 res.status(200).json(dataToSend);
             });
         }
         else{
-            let dataToSend = {posts: data, next : false, prev : false};
+            let dataToSend = {posts: data, next : false, prev : false, page : currentPage};
             res.json(dataToSend);     // Send an empty array.
         }
     });

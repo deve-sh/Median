@@ -1,13 +1,18 @@
+/*
+    Backend for the Blog System - Median. ( Sounds Familiar? I Know. )
+    Written using Node.js and Express Framework.
+*/
+
 // Backend Dependencies.
 
 const express = require('express');
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const bodyParser = require('body-parser');
-const helmet = require('helmet');
-const cors = require('cors');
-const driver = require('./driver');
-const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');        // For Authentication and validations for protected routes.
+require('dotenv').config();                 // For adding the Environment variables from .env file to the process.env Object.
+const bodyParser = require('body-parser');  // For parsing POST, PUT and DELETE data.
+const helmet = require('helmet');           // For blocking fishy requests and other threats.
+const cors = require('cors');               // For allowing requests from various sources.
+const driver = require('./driver');         // For the database connection.
+const bcrypt = require('bcrypt');           // For hashing passwords.
 
 const app = express();  // Instantiating the Express app.
 
@@ -17,12 +22,12 @@ const PORT = process.env.PORT || 6543;
 
 // Middlewares
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(helmet());
-app.use(cors());
+app.use(bodyParser.json());                             // Parse the JSON coming from the POST request.
+app.use(bodyParser.urlencoded({extended: false}));      // Parse the URL Encoded Data coming from the POST request.
+app.use(helmet());                                      // Use helmet for evading threats.
+app.use(cors());                                        // Allow access from multiple sourcess.
 
-// Establishing a static database connection.
+// Establishing a database connection.
 
 const conn = driver.connect(process.env.DB_HOST, process.env.DB_USER, process.env.DB_PASS, process.env.DB_NAME);
 
@@ -234,7 +239,7 @@ app.get('/posts', (req,res) => {
 
                 dataToSend = {posts : data1, next, prev};
 
-                res.json(dataToSend);
+                res.status(200).json(dataToSend);
             });
         }
         else{
@@ -326,6 +331,41 @@ app.post('/updatepost', (req, res) => {
     }
     else{
         res.status(400).send({error: "Required Postid or Token."});
+    }
+});
+
+// Route to validate a token sent by the Frontend.
+
+app.post('/validate', (req,res) => {
+    if(req.body.token){
+        let {token} = req.body;
+
+        token = escape(token);
+
+        jwt.verify(token, process.env.SECRETKEY, (err, decoded) => {
+            if(err)
+                res.status(400).json({error: "Invalid Token."});
+
+            if(decoded.userid){
+                // Userid Verfied using the token, now a second layer of verification would be to check if a user with the given userid exists in the database.
+
+                conn.query("SELECT * FROM blog_users WHERE id = ?", [decoded.userid], (err1, data1) => {
+                    if(err1)
+                        res.status(500).json({error: "Internal Server Error."});
+
+                    if(data1.length > 0)
+                        res.status(200).json({message:"Valid Token."});
+                    else
+                        res.status(404).json({error : "Invalid Token."});
+                });
+            }
+            else{
+                res.status(400).json({error: "Invalid Token."});
+            }
+        });
+    }
+    else{
+        req.status(400).json({error: "Token required."});
     }
 });
 

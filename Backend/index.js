@@ -227,7 +227,6 @@ app.get('/posts', (req,res) => {
 
             conn.query("SELECT * FROM blog_posts LIMIT 10 OFFSET ?", [(currentPage-1)*postsPerPage.toString()], (err1, data1) => {
                 if(err1){
-                    console.log(err1);
                     res.status(500).json({error: "Internal Server Error."});
                 }
                 
@@ -337,8 +336,9 @@ app.post('/updatepost', (req, res) => {
 // Route to get the posts of a user.
 
 app.post('/userposts', (req,res) => {
-    let currentPage = 1;
-    let prev = false, next = false;
+    let currentPage = 1,
+        prev = false,
+        next = false;
 
     if(req.body.page && req.body.page > 0){
         currentPage = Number(escape(req.body.page));
@@ -359,14 +359,52 @@ app.post('/userposts', (req,res) => {
             else{
                 let userid = escape(decoded.userid);
 
-                conn.query("SELECT * FROM blog_posts WHERE id = ?", [userid], (err1,data) => {
-                    if(err)
+                conn.query("SELECT * FROM blog_posts WHERE userid = ?", [userid], (err1,data) => {
+                    if(err1)
                         res.status(500).json({error : "Internal Server Error."});
 
                     if(data.length === 1){
                         // If the user exists in the database.
 
-                        
+                        conn.query("SELECT * FROM blog_posts WHERE userid = ?", [userid], (err2,data1) => {
+                            if(err2)
+                                res.status(500).json({error : "Internal Server Error."});
+
+                            if(data1.length <= 0){
+                                res.json({posts : [], next : false, prev : false});
+                            }
+                            else{
+                                let totalPosts = data1.length,
+                                    postsPerPage = 10;
+
+                                // Now sending 10 posts at a time.
+
+                                conn.query("SELECT * FROM blog_posts WHERE userid = ? LIMIT 10 OFFSET ?", [userid, (currentPage-1)*postsPerPage], (err3, data2) => {
+                                    if(err3)
+                                        res.status(500).json({error : "Internal Server Error."});
+
+                                    if(data2.length <= 0){
+                                        if(currentPage*postsPerPage > 10 && totalPosts > 10)
+                                            prev = true;
+
+                                        // There can be previous posts, but no next posts.
+
+                                        res.json({posts : [], next : false, prev});
+                                    }
+                                    else{
+                                        if(currentPage*postsPerPage > 10 && totalPosts > 10)
+                                            prev = true;
+
+                                        if(currentPage*postsPerPage < totalPosts)
+                                            next = true;
+
+                                        let dataToSend = {posts : data2, prev, next};
+
+                                        res.json(dataToSend);
+                                    }
+                                });
+                            }
+                        });
                     }
                     else{
                         res.status(404).json({error: "Invalid User ID."});
@@ -376,7 +414,6 @@ app.post('/userposts', (req,res) => {
         });
     }
 });
-
 
 // Route to validate a token sent by the Frontend.
 
@@ -410,6 +447,40 @@ app.post('/validate', (req,res) => {
     }
     else{
         req.status(400).json({error: "Token required."});
+    }
+});
+
+// Route to get the userid stored inside a valid token.
+
+app.post('/getuserid', (req,res) => {
+    if(req.body.token){
+        const token = escape(req.body.token);
+
+        jwt.verify(token, process.env.SECRETKEY, (err, decoded) => {
+            if(err){
+                res.status(400).json({error: "Invalid JWT Token."});
+            }
+
+            if(decoded.userid){
+                // We have the userid. But now let's check if the userid is valid by checking it in the database.
+
+                conn.query("SELECT * FROM blog_users WHERE id = ?", [decoded.userid] , (err1, data) => {
+                    if(err1)
+                        res.status(500).json({error: "Internal Server Error."});
+
+                    if(data.length === 1)
+                        res.json({userid : decoded.userid});
+                    else
+                        res.status(400).json({error: "Invalid JWT Token."});
+                });
+            }
+            else{
+                res.status(400).json({error: "Invalid JWT Token."});
+            }
+        });
+    }
+    else{
+        res.status(400).json({error: "Required Token."});
     }
 });
 

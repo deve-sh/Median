@@ -25,7 +25,7 @@ const PORT = process.env.PORT || 6543;
 app.use(bodyParser.json());                             // Parse the JSON coming from the POST request.
 app.use(bodyParser.urlencoded({extended: false}));      // Parse the URL Encoded Data coming from the POST request.
 app.use(helmet());                                      // Use helmet for evading threats.
-app.use(cors());                                        // Allow access from multiple sourcess.
+app.use(cors());                                        // Allow access from multiple sources.
 
 // Establishing a database connection.
 
@@ -359,9 +359,11 @@ app.post('/userposts', (req,res) => {
             else{
                 let userid = escape(decoded.userid);
 
-                conn.query("SELECT * FROM blog_posts WHERE userid = ?", [userid], (err1,data) => {
-                    if(err1)
+                conn.query("SELECT * FROM blog_users WHERE id = ?", [userid], (err1,data) => {
+                    if(err1){
                         res.status(500).json({error : "Internal Server Error."});
+                        console.log(err1);
+                    }
 
                     if(data.length === 1){
                         // If the user exists in the database.
@@ -398,7 +400,7 @@ app.post('/userposts', (req,res) => {
                                         if(currentPage*postsPerPage < totalPosts)
                                             next = true;
 
-                                        let dataToSend = {posts : data2, prev, next};
+                                        let dataToSend = {posts : data2, prev, next, totalPosts};
 
                                         res.json(dataToSend);
                                     }
@@ -482,6 +484,45 @@ app.post('/getuserid', (req,res) => {
     else{
         res.status(400).json({error: "Required Token."});
     }
+});
+
+// Route to get the information about a user from a token.
+
+app.post('/getuser', (req, res) => {
+    let userid = null;
+
+    if(!req.body.token){
+        res.status(400).json({error: "Token Required."});
+        return;
+    }
+
+    jwt.verify(req.body.token, process.env.SECRETKEY, (err, decoded) => {
+        if(err){
+            res.status(500).json({error: "Internal Server Error."});
+            return;
+        }
+
+        if(decoded.userid){
+            userid = decoded.userid;
+
+            conn.query("SELECT id as userid, username FROM blog_users WHERE id = ?", [userid], (err1, data1) => {
+                if(err1){
+                    res.status(500).json({error: "Internal Server Error."});
+                    return;
+                }
+
+                if(data1.length <= 0){
+                    res.status(404).json({error: "No such user found."});
+                    return;
+                }
+
+                res.json(data1[0]);
+            })
+        }
+        else{
+            res.status(400).json({error: "Invalid Token."});
+        }
+    });
 });
 
 // All other routes.

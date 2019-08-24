@@ -225,7 +225,7 @@ app.get('/posts', (req,res) => {
 
             let dataToSend = {};
 
-            conn.query("SELECT * FROM blog_posts LIMIT 10 OFFSET ?", [(currentPage-1)*postsPerPage.toString()], (err1, data1) => {
+            conn.query("SELECT * FROM blog_posts ORDER BY created DESC LIMIT 10 OFFSET ?", [(currentPage-1)*postsPerPage], (err1, data1) => {
                 if(err1){
                     res.status(500).json({error: "Internal Server Error."});
                 }
@@ -381,7 +381,7 @@ app.post('/userposts', (req,res) => {
 
                                 // Now sending 10 posts at a time.
 
-                                conn.query("SELECT * FROM blog_posts WHERE userid = ? LIMIT 10 OFFSET ?", [userid, (currentPage-1)*postsPerPage], (err3, data2) => {
+                                conn.query("SELECT * FROM blog_posts WHERE userid = ? ORDER BY created DESC LIMIT 10 OFFSET ?", [userid, (currentPage-1)*postsPerPage], (err3, data2) => {
                                     if(err3)
                                         res.status(500).json({error : "Internal Server Error."});
 
@@ -521,6 +521,30 @@ app.post('/getuser', (req, res) => {
         }
         else{
             res.status(400).json({error: "Invalid Token."});
+        }
+    });
+});
+
+// Route to get the username using a userid.
+
+app.get('/getusername', (req,res) => {
+    if(!req.query.userid){
+        res.status(400).json({error: "Userid Not Passed to request."});
+        return;
+    }
+
+    conn.query("SELECT * FROM blog_users WHERE id = ?", [escape(req.query.userid)], (err, data) => {
+        if(err){
+            res.status(500).json({error: "Internal Server Error."});
+            return;
+        }
+
+        if(data.length <= 0){
+            res.status(404).json({error: "No such user found."});
+            return;
+        }
+        else{
+            res.json({username : data[0].username});
         }
     });
 });

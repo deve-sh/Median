@@ -597,6 +597,80 @@ app.delete('/deletepost', (req, res) => {
     }
 });
 
+// Route to update the password.
+
+app.put('/updatepass', (req, res) => {
+    if(!req.body.password || !req.body.token){
+        res.status(400).json({error: "New Password and token Required."});
+        return;
+    }
+    else{
+        let {token, password} = req.body;
+
+        token = escape(token);
+        password = escape(password);
+
+        jwt.verify(token, process.env.SECRETKEY, (err, decoded) => {
+            if(err){
+                res.status(400).json({error: "Invalid Token."});
+                return;
+            }
+
+            if(!decoded){
+                res.status(400).json({error: "Invalid Token."});
+                return;
+            }
+            else{
+                let userid = escape(decoded.userid);
+
+                if(userid){
+                    if(password.length < 8){
+                        res.status(400).json({error: "Password length should be greater than 8."});
+                        return;
+                    }
+                    else if(!/[\^%$#@!*\/\\()]/.test(password) || !/[0-9]/.test(password)){
+                        res.status(400).json({error : "Password should contain a special character and at least one number."});
+                        return;
+                    }
+
+                    conn.query("SELECT * FROM blog_users WHERE id = ?", [userid], (err1, data1) => {
+                        if(err1){
+                            res.status(500).json({error: "Internal Server Error."});
+                            return;
+                        }
+
+                        if(data1.length <= 0){
+                            res.status(404).json({error: "User not found."});
+                            return;
+                        }
+
+                        let hash = bcrypt.hashSync(password, 12);
+
+                        if(hash){
+                            conn.query("UPDATE blog_users SET password = ? WHERE id = ?", [hash, userid], (err2, data2) => {
+                                if(err2){
+                                    res.status(500).json({error: "Internal Server Error."});
+                                    return;
+                                }
+
+                                res.json({message: "Successfully updated password."});
+                            });
+                        }
+                        else{
+                            res.status(500).json({error: "Internal Server Error."});
+                            return;
+                        }
+                    });
+                }
+                else{
+                    res.status(400).json({error: "Invalid Token."});
+                    return;
+                }
+            }
+        });
+    }
+});
+
 // All other routes.
 
 app.get('/register', (req,res) => {

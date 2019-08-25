@@ -129,7 +129,7 @@ app.post('/login', (req,res) => {
 
                     const payLoad = { userid };
 
-                    jwt.sign(payLoad, process.env.SECRETKEY, {expiresIn : Date.now() + (84600 * 30)}, (err1, token) => {
+                    jwt.sign(payLoad, process.env.SECRETKEY, (err1, token) => {
                         if(err1)
                             res.status(500).json({status : 500, error : "Internal Server Error."});
                         
@@ -171,7 +171,7 @@ app.post('/submitpost', (req, res) => {
             let userid = decoded.userid;
 
             postTitle = escape(postTitle);
-            postContent = escape(postContent);  
+            postContent = escape(postContent);
 
             // Now that the user has been verified, check if there exists a user with the userid.
 
@@ -547,6 +547,54 @@ app.get('/getusername', (req,res) => {
             res.json({username : data[0].username});
         }
     });
+});
+
+// Route to delete a post.
+
+app.delete('/deletepost', (req, res) => {
+    if(req.body.token && req.body.pid){
+        const {token, pid} = req.body;
+
+        jwt.verify(token, process.env.SECRETKEY, (err, decoded) => {
+            if(err){
+                res.status(400).json({error: "Invalid Token."});
+                return;
+            }
+
+            if(decoded){
+                let userid = escape(decoded.userid);
+
+                conn.query("SELECT * FROM blog_users WHERE id = ?", [userid], (err1, data1) => {
+                    if(err1){
+                        res.status(500).json({error: "Internal Server Error."});
+                        return;
+                    }
+
+                    if(data1.length <= 0){
+                        res.status(404).json({error: "User not found."});
+                        return;
+                    }
+                    else{
+                        conn.query("DELETE FROM blog_posts WHERE userid = ? AND postid = ?", [userid, escape(pid)], (err2, data2) => {
+                            if(err2){
+                                res.status(500).json({error: "Internal Server Error."});
+                                return;
+                            }
+
+                            res.json({message: "Deleted Post."});
+                        });
+                    }
+                });
+            }
+            else{
+                res.status(400).json({error: "Invalid Token."});
+                return;
+            }
+        });
+    }
+    else{
+        res.status(400).json({error: "Required Token and Post ID."});
+    }
 });
 
 // All other routes.

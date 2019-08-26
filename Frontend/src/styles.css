@@ -1,0 +1,311 @@
+* {
+  box-sizing: border-box;
+  transition: 0.25s;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  line-height: 1.61;
+  max-width: 100%;
+}
+
+/* Overwriting some styles from Bootstrap */
+
+.row {
+  margin: 0;
+  padding: 0;
+}
+
+.col-1,
+.col-2,
+.col-3,
+.col-4,
+.col-5,
+.col-6,
+.col-7,
+.col-8,
+.col-9,
+.col-10,
+.col-11,
+.col-12,
+.col,
+.col-auto,
+.col-sm-1,
+.col-sm-2,
+.col-sm-3,
+.col-sm-4,
+.col-sm-5,
+.col-sm-6,
+.col-sm-7,
+.col-sm-8,
+.col-sm-9,
+.col-sm-10,
+.col-sm-11,
+.col-sm-12,
+.col-sm,
+.col-sm-auto,
+.col-md-1,
+.col-md-2,
+.col-md-3,
+.col-md-4,
+.col-md-5,
+.col-md-6,
+.col-md-7,
+.col-md-8,
+.col-md-9,
+.col-md-10,
+.col-md-11,
+.col-md-12,
+.col-md,
+.col-md-auto,
+.col-lg-1,
+.col-lg-2,
+.col-lg-3,
+.col-lg-4,
+.col-lg-5,
+.col-lg-6,
+.col-lg-7,
+.col-lg-8,
+.col-lg-9,
+.col-lg-10,
+.col-lg-11,
+.col-lg-12,
+.col-lg,
+.col-lg-auto,
+.col-xl-1,
+.col-xl-2,
+.col-xl-3,
+.col-xl-4,
+.col-xl-5,
+.col-xl-6,
+.col-xl-7,
+.col-xl-8,
+.col-xl-9,
+.col-xl-10,
+.col-xl-11,
+.col-xl-12,
+.col-xl,
+.col-xl-auto {
+  padding: 0;
+}
+
+/* Page Specific Styles */
+
+#loginpage,
+#registerpage {
+  padding: 0rem;
+  text-align: center;
+}
+
+#loginform,
+#registerform {
+  display: inline-block;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12), 0 1px 1.5px rgba(0, 0, 0, 0.24);
+  border: 0.1rem solid #cfcfcf;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  padding: 1.5rem;
+  border-radius: 0.3rem;
+}
+
+#head {
+  background: #001021;
+  color: white;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07), 0 1px 5px 0 rgba(0, 0, 0, 0.11),
+    0 3px 1px -2px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07),
+    0 1px 5px 0 rgba(0, 0, 0, 0.11), 0 3px 1px -2px rgba(0, 0, 0, 0.1);
+  -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.07),
+    0 1px 5px 0 rgba(0, 0, 0, 0.11), 0 3px 1px -2px rgba(0, 0, 0, 0.1);
+  padding: 0;
+}
+
+#head .headerContainer {
+  max-width: 1000px;
+  padding: 1rem;
+  margin: 0 auto;
+}
+
+#head a {
+  color: white;
+  text-decoration: none;
+}
+
+#head .logoutButton {
+  cursor: pointer;
+}
+
+.descBox {
+  margin: 0 auto;
+  max-width: 1000px;
+  padding: 1rem;
+}
+
+.containedImage {
+  padding: 1.8rem 1rem;
+  max-width: 100%;
+}
+
+.ColToPad {
+  padding: 1rem;
+  text-align: center;
+}
+
+footer {
+  background: #17262a;
+  padding: 0.8rem 0;
+  color: white;
+}
+
+footer a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.15em;
+}
+
+@media only screen and (min-width: 768px) {
+  .ColToPad {
+    padding: 4rem 1rem;
+    text-align: left;
+  }
+}
+
+/* Posts Page */
+
+#postsPage {
+  padding: 0;
+}
+
+.postsContainer {
+  padding: 1rem;
+  margin: 0 auto;
+  max-width: 1000px;
+  min-height: 90vh;
+}
+
+.post {
+  padding: 1rem;
+  border: 0.1rem solid #dfdfdf;
+  border-radius: 0.2rem;
+  text-align: left;
+  color: black;
+  margin-bottom: 0.85rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.post:hover {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+.post a {
+  color: black;
+  text-decoration: none;
+}
+
+.post .postTitle {
+  font-weight: bold;
+  padding: 0.5rem;
+  font-size: 1.4em;
+}
+
+.post .postDesc {
+  padding: 0.5rem;
+}
+
+.post .postTime {
+  padding: 0.5rem;
+  color: gray;
+  font-size: 0.9em;
+}
+
+/* User Profile Page */
+
+#userContainer {
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 90vh;
+  text-align: center;
+}
+
+/* Post Page */
+
+#postPage {
+  padding: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 80vh;
+}
+
+#postTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+#userName {
+  font-weight: bold;
+  color: gray;
+}
+
+#createdAt {
+  color: gray;
+  font-size: 0.9rem;
+}
+
+/* Create Post Page */
+
+#creatorPage {
+  padding: 1rem;
+  margin: 0 auto;
+  max-width: 1000px;
+  min-height: 90vh;
+}
+
+#postContentField {
+  padding: 0.5rem;
+  border: 0.1rem solid #ddccdd;
+  border-radius: 0.25rem;
+  min-height: 50vh;
+  overflow: auto;
+  outline: none;
+  max-height: 50vh;
+}
+
+[contentEditable="true"]:empty:not(:focus):before {
+  content: attr(holder);
+  color: gray;
+}
+
+/* Hovering Button */
+
+#hoveringButton {
+  padding: 1rem;
+  position: fixed;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: red;
+  text-align: center;
+  z-index: 100;
+  right: 2rem;
+  bottom: 2rem;
+  color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+/* Password Updation Page */
+
+#passwordUpdater {
+  padding: 1rem;
+  max-width: 1000px;
+  min-height: 90vh;
+  margin: 0 auto;
+}
+
+.bigIcon {
+  padding: 3rem;
+  display: inline-block;
+  border-radius: 50%;
+  background: #efefef;
+  color: darkgray;
+}

@@ -2,6 +2,7 @@
   "name": "blog-frontend",
   "version": "1.0.0",
   "description": "",
+  "author":"Devesh Kumar",
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {

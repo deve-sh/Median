@@ -24,7 +24,7 @@ const Header = props => {
               </Link>
               &nbsp;&nbsp;&nbsp;&nbsp;
               <Link to="/register" title="Register">
-                <i className="fas fa-user-plus" />
+                <i className="fas fa-user-plus fa-lg" />
               </Link>
             </span>
           ) : (

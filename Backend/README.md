@@ -37,6 +37,8 @@ SECRETKEY=
 
 Where DB_HOST is the host your MySQL database runs on, DB_USER is the username of the Database user, DB_PASS the user's password and DB_NAME is the database name.
 
+Now, in the MySQL Database, before starting anything else, run the queries provided in **Queries.sql**. (These are the tables the app operates on.)
+
 The SECRETKEY should be set to a random string, this is used in encrypting JSON Web Token for sessionless authentication between the Backend and Frontend.
 
 Once all that is done, just run the following commands :
@@ -56,7 +58,7 @@ The app should be setup now.
 The API serves the following routes : 
 
 * POST **/register** : Route to register a user. Needs username, password and email in the request body.
-* POST **/login** : Route to login a user, returns a Signed JWT with the userid of the user if user exits. Needs username and password in the request body.
+* POST **/login** : Route to login a user, returns a Signed [JWT](https://github.com/auth0/node-jsonwebtoken) with the userid of the user if user exits. Needs username and password in the request body.
 * POST **/submitpost** : Route to submit a post on behalf of a user, takes the token, postTitle, postContent in the request body.
 * GET **/posts** : Returns a dump of 10 posts in the database for all the users, in descending order of their timestamps (Latest First). Returns **next** and **prev** along with the posts to signify if there are more posts upcoming or before the page. To get a specific page, just send a query parameter **page** set to the page no you want to posts from.
 
@@ -65,3 +67,14 @@ The API serves the following routes :
 ## Hosting
 
 Host the backend on a service that supports Node.js and MySQL Hosting. Or you could use a service like CloudSQL and a seperate Node.js service like Glitch or Heroku. Or you could just deploy it all in a container on a service like Digital Ocean.
+
+### Open Source Libraries used
+
+* [Express](https://expressjs.com/)
+* [Body Parser](https://www.npmjs.com/package/body-parser)
+* [BCrypt](https://www.npmjs.com/package/bcrypt)
+* [CORS](https://www.npmjs.com/package/cors)
+* [Dotenv](https://www.npmjs.com/package/dotenv)
+* [JSON Web Token](https://github.com/auth0/node-jsonwebtoken)
+* [Helmet](https://npmjs.com/package/helmet)
+* [MySQL Node](https://npmjs.com/package/mysql)
